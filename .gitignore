@@ -48,3 +48,17 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Package manager caches
+.pnpm-store/
+
+# Docker artifacts
+docker-compose.override.yml
+.dockerignore
+
+# Build artifacts
+.next/cache/
+payload-build/
+
+# Lockfiles (non-active package managers)
+pnpm-lock.yaml
