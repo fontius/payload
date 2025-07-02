@@ -2,7 +2,6 @@
 
 This repository contains the content management "brain" for the Hockey Team Website. It is a headless CMS built with **Payload 3.0** and **Next.js 15**, designed for a modern, scalable, and maintainable web architecture.
 
-The live, public-facing website is a separate Next.js application which consumes the API provided by this project. You can find the frontend repository here: **[fontius/payload-web](https://github.com/fontius/payload-web)**.
 
 ## Core Technologies
 
