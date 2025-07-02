@@ -3,12 +3,12 @@ import React from 'react'
 import './styles.css'
 
 const hubot = localFont({
-  src: '../public/fonts/HubotSansVF-Regular.ttf',
+  src: './public/fonts/HubotSansVF-Regular.ttf',
   variable: '--font-hubot',
 })
 
 const mona = localFont({
-  src: '../public/fonts/MonaSansVF-Regular.woff2',
+  src: './public/fonts/MonaSansVF-Regular.woff2',
   variable: '--font-mona',
 })
 
