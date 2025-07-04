@@ -1,18 +1,24 @@
-import { withPayload } from '@payloadcms/next/withPayload'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  /*
+    The `output: 'standalone'` option is required by the provided Dockerfile.
+    It creates a standalone folder with only the necessary files for production,
+    minimizing the Docker image size.
+  */
   output: 'standalone',
-  // Your Next.js config here
-  webpack: (webpackConfig) => {
-    webpackConfig.resolve.extensionAlias = {
-      '.cjs': ['.cts', '.cjs'],
-      '.js': ['.ts', '.tsx', '.js', '.jsx'],
-      '.mjs': ['.mts', '.mjs'],
-    }
 
-    return webpackConfig
+  webpack: (config) => {
+    // This explicitly configures the Webpack resolver to ensure it
+    // understands the `@/` path alias, fixing the font loading issue.
+    config.resolve.alias['@'] = path.resolve(__dirname, './src')
+    return config
   },
 }
 
-export default withPayload(nextConfig, { devBundleServerPackages: false })
+export default nextConfig

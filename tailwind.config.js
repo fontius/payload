@@ -2,7 +2,11 @@
 import defaultTheme from 'tailwindcss/defaultTheme'
 
 const tailwindConfig = {
-  content: ['./*.{js,ts,jsx,tsx,mdx}', './src/app/(frontend)/**/*.{js,ts,jsx,tsx,mdx}'],
+  content: [
+    './src/app/(frontend)/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/collections/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
   theme: {
     extend: {
       colors: {

@@ -1,15 +1,15 @@
 import localFont from 'next/font/local'
 import React from 'react'
-import './styles.css'
-
-const hubot = localFont({
-  src: './public/fonts/HubotSansVF-Regular.ttf',
-  variable: '--font-hubot',
-})
+import './globals.css'
 
 const mona = localFont({
-  src: './public/fonts/MonaSansVF-Regular.woff2',
+  src: '@/fonts/MonaSansVF-Regular.woff2',
   variable: '--font-mona',
+})
+
+const hubot = localFont({
+  src: '@/fonts/HubotSansVF-Regular.ttf',
+  variable: '--font-hubot',
 })
 
 export const metadata = {
@@ -17,14 +17,10 @@ export const metadata = {
   title: 'Payload Blank Template',
 }
 
-export default async function RootLayout(props: { children: React.ReactNode }) {
-  const { children } = props
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${hubot.variable} ${mona.variable}`}>
-      <body>
-        <main>{children}</main>
-      </body>
+      <body>{children}</body>
     </html>
   )
 }
