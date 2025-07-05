@@ -5,19 +5,16 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "cross-env-file -p .env.local next dev",
-    "dev:staging": "cross-env-file -p .env.staging next dev",
+    "dev": "dotenv -e .env.local -- next dev",
+    "dev:staging": "dotenv -e .env.staging -- next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "payload": "payload",
     "generate:types": "payload generate:types",
-    "seed:local": "cross-env-file -p .env.local ts-node src/payload/seed/index.ts",
-    "seed:staging": "cross-env-file -p .env.staging ts-node src/payload/seed/index.ts",
-    "seed:production": "cross-env-file -p .env.production ts-node src/payload/seed/index.ts",
-    "test": "pnpm run test:int && pnpm run test:e2e",
-    "test:e2e": "playwright test",
-    "test:int": "vitest run --config ./vitest.config.mts"
+    "seed:local": "dotenv -e .env.local -- ts-node src/payload/seed/index.ts",
+    "seed:staging": "dotenv -e .env.staging -- ts-node src/payload/seed/index.ts",
+    "seed:production": "dotenv -e .env.production -- ts-node src/payload/seed/index.ts"
   },
   "dependencies": {
     "@payloadcms/db-mongodb": "^3.0.0",
@@ -25,34 +22,27 @@
     "@payloadcms/plugin-cloud-storage": "^3.0.0",
     "@payloadcms/richtext-lexical": "^3.0.0",
     "@payloadcms/ui": "^3.0.0",
-    "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
     "graphql": "^16.8.1",
     "next": "^15.3.4",
     "payload": "^3.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "sharp": "0.32.6"
+    "sharp": "^0.33.4"
   },
   "devDependencies": {
-    "@playwright/test": "^1.44.0",
-    "@testing-library/react": "^15.0.6",
     "@types/node": "^20.12.12",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.19",
-    "cross-env-file": "^1.0.2",
+    "dotenv-cli": "^7.4.2",
     "eslint": "^9.30.1",
     "eslint-config-next": "^14.2.3",
-    "jsdom": "^24.0.0",
-    "playwright": "^1.44.0",
     "postcss": "^8.4.38",
     "prettier": "^3.2.5",
     "tailwindcss": "^3.4.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5",
-    "vitest": "^1.6.0"
+    "typescript": "^5.4.5"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0"

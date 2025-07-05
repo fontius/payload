@@ -69,28 +69,16 @@ src/
     Users.ts
   payload-types.ts
   payload.config.ts
-tests/
-  e2e/
-    frontend.e2e.spec.ts
-  int/
-    api.int.spec.ts
-.env.example
 .gitignore
-.npmrc
 .prettierrc.json
-.yarnrc
 docker-compose.yml
 Dockerfile
 eslint.config.mjs
 next.config.mjs
 package.json
-playwright.config.ts
 README.md
 tailwind.config.js
-test.env
 tsconfig.json
-vitest.config.mts
-vitest.setup.ts
 </directory_structure>
 
 <files>
@@ -133,76 +121,6 @@ This section contains the contents of the repository's files.
     @apply text-gold hover:text-gold-100 transition-colors duration-200;
   }
 }
-</file>
-
-<file path="src/app/layout.tsx">
-import React from 'react'
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  )
-}
-</file>
-
-<file path="src/app/postcss.config.js">
-module.exports = {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-}
-</file>
-
-<file path="tailwind.config.js">
-/** @type {import('tailwindcss').Config} */
-import defaultTheme from 'tailwindcss/defaultTheme'
-
-const tailwindConfig = {
-  content: [
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/collections/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
-  theme: {
-    extend: {
-      colors: {
-        sailor: {
-          DEFAULT: '#102E50', // primary dark navy
-          100: '#324B73', // lighter shade
-          200: '#507798',
-          300: '#6D93BC',
-          400: '#8CB0E0',
-        },
-        gold: {
-          DEFAULT: '#F5C45E', // mustard/gold accent
-          100: '#F9D78C',
-          200: '#FBD9A7',
-          300: '#FCEAC2',
-        },
-        orange: {
-          DEFAULT: '#E78B48', // team orange
-          100: '#EC9D69',
-          200: '#F1AE8A',
-        },
-        red: {
-          DEFAULT: '#BE3D2A', // bold red
-          100: '#D25A46',
-          200: '#E48B79',
-        },
-      },
-      fontFamily: {
-        sans: ['var(--font-hubot)', ...defaultTheme.fontFamily.sans],
-        display: ['var(--font-mona)', ...defaultTheme.fontFamily.sans],
-      },
-    },
-  },
-  plugins: [],
-}
-
-export default tailwindConfig
 </file>
 
 <file path="src/app/(payload)/admin/[[...segments]]/not-found.tsx">
@@ -257,12 +175,6 @@ const Page = ({ params, searchParams }: Args) =>
   RootPage({ config, params, searchParams, importMap })
 
 export default Page
-</file>
-
-<file path="src/app/(payload)/admin/importMap.js">
-export const importMap = {
-
-}
 </file>
 
 <file path="src/app/(payload)/api/[...slug]/route.ts">
@@ -357,6 +269,27 @@ export const GET = async (request: Request) => {
 }
 </file>
 
+<file path="src/app/layout.tsx">
+import React from 'react'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  )
+}
+</file>
+
+<file path="src/app/postcss.config.js">
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+</file>
+
 <file path="src/collections/Media.ts">
 import type { CollectionConfig } from 'payload'
 
@@ -392,64 +325,6 @@ export const Users: CollectionConfig = {
 }
 </file>
 
-<file path="tests/e2e/frontend.e2e.spec.ts">
-import { test, expect, Page } from '@playwright/test'
-
-test.describe('Frontend', () => {
-  let page: Page
-
-  test.beforeAll(async ({ browser }, testInfo) => {
-    const context = await browser.newContext()
-    page = await context.newPage()
-  })
-
-  test('can go on homepage', async ({ page }) => {
-    await page.goto('http://localhost:3000')
-
-    await expect(page).toHaveTitle(/Payload Blank Template/)
-
-    const headging = page.locator('h1').first()
-
-    await expect(headging).toHaveText('Theme Showcase')
-  })
-})
-</file>
-
-<file path="tests/int/api.int.spec.ts">
-import { getPayload, Payload } from 'payload'
-import config from '@/payload.config'
-
-import { describe, it, beforeAll, expect } from 'vitest'
-
-let payload: Payload
-
-describe('API', () => {
-  beforeAll(async () => {
-    const payloadConfig = await config
-    payload = await getPayload({ config: payloadConfig })
-  })
-
-  it('fetches users', async () => {
-    const users = await payload.find({
-      collection: 'users',
-    })
-    expect(users).toBeDefined()
-  })
-})
-</file>
-
-<file path=".env.example">
-# This file is an example. Create a .env file with your actual credentials.
-# Do not commit the .env file to version control.
-
-DATABASE_URI=mongodb://mongo:27017/hockey-cms-dev
-PAYLOAD_SECRET=REPLACE_WITH_A_LONG_RANDOM_STRING
-</file>
-
-<file path=".npmrc">
-legacy-peer-deps=true
-</file>
-
 <file path=".prettierrc.json">
 {
   "singleQuote": true,
@@ -457,10 +332,6 @@ legacy-peer-deps=true
   "printWidth": 100,
   "semi": false
 }
-</file>
-
-<file path=".yarnrc">
---install.ignore-engines true
 </file>
 
 <file path="Dockerfile">
@@ -578,52 +449,152 @@ const eslintConfig = [
 export default eslintConfig
 </file>
 
-<file path="playwright.config.ts">
-import { defineConfig, devices } from '@playwright/test'
+<file path="tailwind.config.js">
+/** @type {import('tailwindcss').Config} */
+import defaultTheme from 'tailwindcss/defaultTheme'
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-import 'dotenv/config'
-
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
-export default defineConfig({
-  testDir: './tests/e2e',
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
-  forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
-  use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
-    // baseURL: 'http://localhost:3000',
-
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
-  },
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
+const tailwindConfig = {
+  content: [
+    './src/app/(frontend)/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/collections/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  webServer: {
-    command: 'pnpm dev',
-    reuseExistingServer: true,
-    url: 'http://localhost:3000',
+  theme: {
+    extend: {
+      colors: {
+        sailor: {
+          DEFAULT: '#102E50', // primary dark navy
+          100: '#324B73', // lighter shade
+          200: '#507798',
+          300: '#6D93BC',
+          400: '#8CB0E0',
+        },
+        gold: {
+          DEFAULT: '#F5C45E', // mustard/gold accent
+          100: '#F9D78C',
+          200: '#FBD9A7',
+          300: '#FCEAC2',
+        },
+        orange: {
+          DEFAULT: '#E78B48', // team orange
+          100: '#EC9D69',
+          200: '#F1AE8A',
+        },
+        red: {
+          DEFAULT: '#BE3D2A', // bold red
+          100: '#D25A46',
+          200: '#E48B79',
+        },
+      },
+      fontFamily: {
+        sans: ['var(--font-hubot)', ...defaultTheme.fontFamily.sans],
+        display: ['var(--font-mona)', ...defaultTheme.fontFamily.sans],
+      },
+    },
   },
-})
+  plugins: [],
+}
+
+export default tailwindConfig
 </file>
 
-<file path="test.env">
-NODE_OPTIONS="--no-deprecation --no-experimental-strip-types"
+<file path="src/app/(payload)/admin/importMap.js">
+export const importMap = {
+
+}
+</file>
+
+<file path="README.md">
+# Hockey Team Website - Headless CMS
+
+This repository contains the content management "brain" for the Hockey Team Website. It is a headless CMS built with **Payload 3.0** and **Next.js 15**, designed for a modern, scalable, and maintainable web architecture.
+
+
+## Core Technologies
+
+*   **CMS:** [Payload 3.0](https://payloadcms.com)
+*   **Framework:** [Next.js 15](https://nextjs.org) (for the admin panel)
+*   **Database:** [MongoDB](https://www.mongodb.com/)
+*   **Containerization:** [Docker](https://www.docker.com/)
+*   **Deployment:** [Coolify](https://coolify.io) (CI/CD from GitHub)
+
+---
+
+## Why Payload CMS over WordPress?
+
+Choosing Payload CMS for this project was a strategic decision to prioritize developer experience, performance, and long-term maintainability over the traditional approach of WordPress.
+
+| Feature                  | Payload CMS (This Project)                                                              | WordPress                                                                          |
+| ------------------------ | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| **Architecture**         | **Headless-first.** Decouples content from presentation. Use any frontend framework.      | Monolithic by default. The REST API can be slow and requires extra configuration.  |
+| **Configuration**        | **Code-as-Config.** Data models are defined in TypeScript. Schema is version-controlled. | **Database-driven.** Relies on UI clicks and database state. Fragile and hard to version. |
+| **Tech Stack**           | **Modern.** Built on Node.js, React, and TypeScript. Fast, secure, and familiar to modern devs. | PHP-based. A large ecosystem, but can feel dated and has a higher learning curve for JS devs. |
+| **Extensibility**        | **Clean & Controlled.** Add features via clean code. No "plugin hell."                    | **Plugin-dependent.** Functionality relies on third-party plugins of varying quality and security. |
+| **Security**             | **Minimal Attack Surface.** You control the entire codebase. No bloated, insecure plugins. | A massive target for hackers. Security depends on constant updates and plugin vigilance. |
+| **Developer Experience** | **Exceptional.** Type-safety, powerful local development, and a clean, modern API.       | Can be cumbersome, with a mix of PHP templates, hooks, and a complex database schema. |
+
+---
+
+## The Benefits of Self-Hosting with Coolify
+
+Instead of paying for a managed CMS service (like Contentful or Sanity) or premium WordPress hosting (like WP Engine), this project is self-hosted on a Virtual Private Server (VPS) and managed via Coolify. This provides the best of both worlds: total control and a modern DevOps experience.
+
+#### 1. Drastic Cost Reduction
+Managed CMS platforms charge based on usage metrics like API calls, users, and content records. These costs can become unpredictable and expensive as the site grows.
+
+*   **Managed CMS:** Can range from $100 to $1000+/month for a high-traffic site.
+*   **Self-Hosted on a VPS:** A fixed, predictable cost (typically $10-$40/month) for the server, regardless of traffic or data volume.
+
+#### 2. Complete Data Ownership & No Vendor Lock-In
+Your content, user data, and media files reside in *your* database on *your* server.
+*   **Control:** You have full control over backups, data sovereignty, and security policies.
+*   **Flexibility:** You can migrate your entire stack to another provider at any time without being locked into a proprietary API or data structure.
+
+#### 3. No Artificial Limitations
+Self-hosting removes the arbitrary limits on API calls, content types, or admin users that are common with SaaS platforms. The only limits are the resources of your server.
+
+#### 4. The "PaaS" Experience with Coolify
+Coolify provides the polished, Git-driven deployment workflow of a Platform-as-a-Service (like Vercel or Heroku) for your own server. It automates:
+*   **CI/CD:** Automatically builds and deploys from GitHub pushes.
+*   **SSL Certificates:** Free, automatic SSL via Let's Encrypt.
+*   **Database Management:** Easy provisioning and connection string management.
+*   **Environment Variables:** Securely injects secrets for staging and production.
+
+---
+
+## Local Development
+
+This project is configured to run locally using Docker and Docker Compose, ensuring a consistent environment that mirrors production.
+
+#### Prerequisites
+*   [Docker](https://www.docker.com/get-started)
+
+#### Running the Project
+
+1.  **Set up environment variables:**
+    ```bash
+    cp .env.example .env
+    ```
+    > **Important:** Open the new `.env` file and replace the placeholder values. The `DATABASE_URI` should point to the Docker-hosted mongo service: `mongodb://mongo:27017/hockey-cms-dev`.
+
+2.  **Start the services:**
+    ```bash
+    docker-compose up
+    ```
+
+3.  **Access the application:**
+    *   **Admin Panel:** http://localhost:3000/admin
+
+The first time you access the admin panel, Payload will prompt you to create your first administrative user.
+
+## Deployment
+
+Deployment is handled automatically by Coolify via webhooks connected to this GitHub repository.
+
+*   **Production:** A push or merge to the `main` branch will trigger a production deployment.
+*   **Staging:** A push or merge to the `staging` (or `develop`) branch will trigger a deployment to the staging environment.
+
+Coolify uses the `Dockerfile` in this repository to build a production-optimized container image. Environment variables (like the database URI and payload secret) are injected securely from the Coolify dashboard.
 </file>
 
 <file path="tsconfig.json">
@@ -659,28 +630,6 @@ NODE_OPTIONS="--no-deprecation --no-experimental-strip-types"
   ],
   "exclude": ["node_modules"]
 }
-</file>
-
-<file path="vitest.config.mts">
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
-import tsconfigPaths from 'vite-tsconfig-paths'
-
-export default defineConfig({
-  plugins: [tsconfigPaths(), react()],
-  test: {
-    environment: 'jsdom',
-    setupFiles: ['./vitest.setup.ts'],
-    include: ['tests/int/**/*.int.spec.ts'],
-  },
-})
-</file>
-
-<file path="vitest.setup.ts">
-// Any setup scripts you might need go here
-
-// Load .env files
-import 'dotenv/config'
 </file>
 
 <file path="src/payload-types.ts">
@@ -986,7 +935,6 @@ declare module 'payload' {
 </file>
 
 <file path="src/payload.config.ts">
-// storage-adapter-import-placeholder
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
@@ -1003,9 +951,6 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     user: Users.slug,
-    importMap: {
-      baseDir: path.resolve(dirname),
-    },
   },
   collections: [Users, Media],
   editor: lexicalEditor(),
@@ -1065,7 +1010,9 @@ yarn-error.log*
 next-env.d.ts
 
 .env
-
+.env.local
+.env.staging
+.env.production
 /media
 
 # Playwright
@@ -1138,99 +1085,6 @@ const nextConfig = {
 }
 
 export default nextConfig
-</file>
-
-<file path="README.md">
-# Hockey Team Website - Headless CMS
-
-This repository contains the content management "brain" for the Hockey Team Website. It is a headless CMS built with **Payload 3.0** and **Next.js 15**, designed for a modern, scalable, and maintainable web architecture.
-
-
-## Core Technologies
-
-*   **CMS:** [Payload 3.0](https://payloadcms.com)
-*   **Framework:** [Next.js 15](https://nextjs.org) (for the admin panel)
-*   **Database:** [MongoDB](https://www.mongodb.com/)
-*   **Containerization:** [Docker](https://www.docker.com/)
-*   **Deployment:** [Coolify](https://coolify.io) (CI/CD from GitHub)
-
----
-
-## Why Payload CMS over WordPress?
-
-Choosing Payload CMS for this project was a strategic decision to prioritize developer experience, performance, and long-term maintainability over the traditional approach of WordPress.
-
-| Feature                  | Payload CMS (This Project)                                                              | WordPress                                                                          |
-| ------------------------ | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| **Architecture**         | **Headless-first.** Decouples content from presentation. Use any frontend framework.      | Monolithic by default. The REST API can be slow and requires extra configuration.  |
-| **Configuration**        | **Code-as-Config.** Data models are defined in TypeScript. Schema is version-controlled. | **Database-driven.** Relies on UI clicks and database state. Fragile and hard to version. |
-| **Tech Stack**           | **Modern.** Built on Node.js, React, and TypeScript. Fast, secure, and familiar to modern devs. | PHP-based. A large ecosystem, but can feel dated and has a higher learning curve for JS devs. |
-| **Extensibility**        | **Clean & Controlled.** Add features via clean code. No "plugin hell."                    | **Plugin-dependent.** Functionality relies on third-party plugins of varying quality and security. |
-| **Security**             | **Minimal Attack Surface.** You control the entire codebase. No bloated, insecure plugins. | A massive target for hackers. Security depends on constant updates and plugin vigilance. |
-| **Developer Experience** | **Exceptional.** Type-safety, powerful local development, and a clean, modern API.       | Can be cumbersome, with a mix of PHP templates, hooks, and a complex database schema. |
-
----
-
-## The Benefits of Self-Hosting with Coolify
-
-Instead of paying for a managed CMS service (like Contentful or Sanity) or premium WordPress hosting (like WP Engine), this project is self-hosted on a Virtual Private Server (VPS) and managed via Coolify. This provides the best of both worlds: total control and a modern DevOps experience.
-
-#### 1. Drastic Cost Reduction
-Managed CMS platforms charge based on usage metrics like API calls, users, and content records. These costs can become unpredictable and expensive as the site grows.
-
-*   **Managed CMS:** Can range from $100 to $1000+/month for a high-traffic site.
-*   **Self-Hosted on a VPS:** A fixed, predictable cost (typically $10-$40/month) for the server, regardless of traffic or data volume.
-
-#### 2. Complete Data Ownership & No Vendor Lock-In
-Your content, user data, and media files reside in *your* database on *your* server.
-*   **Control:** You have full control over backups, data sovereignty, and security policies.
-*   **Flexibility:** You can migrate your entire stack to another provider at any time without being locked into a proprietary API or data structure.
-
-#### 3. No Artificial Limitations
-Self-hosting removes the arbitrary limits on API calls, content types, or admin users that are common with SaaS platforms. The only limits are the resources of your server.
-
-#### 4. The "PaaS" Experience with Coolify
-Coolify provides the polished, Git-driven deployment workflow of a Platform-as-a-Service (like Vercel or Heroku) for your own server. It automates:
-*   **CI/CD:** Automatically builds and deploys from GitHub pushes.
-*   **SSL Certificates:** Free, automatic SSL via Let's Encrypt.
-*   **Database Management:** Easy provisioning and connection string management.
-*   **Environment Variables:** Securely injects secrets for staging and production.
-
----
-
-## Local Development
-
-This project is configured to run locally using Docker and Docker Compose, ensuring a consistent environment that mirrors production.
-
-#### Prerequisites
-*   [Docker](https://www.docker.com/get-started)
-
-#### Running the Project
-
-1.  **Set up environment variables:**
-    ```bash
-    cp .env.example .env
-    ```
-    > **Important:** Open the new `.env` file and replace the placeholder values. The `DATABASE_URI` should point to the Docker-hosted mongo service: `mongodb://mongo:27017/hockey-cms-dev`.
-
-2.  **Start the services:**
-    ```bash
-    docker-compose up
-    ```
-
-3.  **Access the application:**
-    *   **Admin Panel:** http://localhost:3000/admin
-
-The first time you access the admin panel, Payload will prompt you to create your first administrative user.
-
-## Deployment
-
-Deployment is handled automatically by Coolify via webhooks connected to this GitHub repository.
-
-*   **Production:** A push or merge to the `main` branch will trigger a production deployment.
-*   **Staging:** A push or merge to the `staging` (or `develop`) branch will trigger a deployment to the staging environment.
-
-Coolify uses the `Dockerfile` in this repository to build a production-optimized container image. Environment variables (like the database URI and payload secret) are injected securely from the Coolify dashboard.
 </file>
 
 <file path="src/app/(frontend)/layout.tsx">
@@ -1378,60 +1232,70 @@ export default function HomePage() {
 
 <file path="package.json">
 {
-  "name": "payload-next-app",
+  "name": "hockey-cms",
   "version": "1.0.0",
-  "description": "A blank template to get started with Payload 3.0",
+  "description": "Headless CMS for the Hockey Team Website",
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
-    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
-    "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
-    "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
-    "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
-    "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
-    "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
-    "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
+    "dev": "cross-env-file -p .env.local next dev",
+    "dev:staging": "cross-env-file -p .env.staging next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "payload": "payload",
+    "generate:types": "payload generate:types",
+    "seed:local": "cross-env-file -p .env.local ts-node src/payload/seed/index.ts",
+    "seed:staging": "cross-env-file -p .env.staging ts-node src/payload/seed/index.ts",
+    "seed:production": "cross-env-file -p .env.production ts-node src/payload/seed/index.ts",
     "test": "pnpm run test:int && pnpm run test:e2e",
-    "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --no-experimental-strip-types\" pnpm exec playwright test",
-    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
+    "test:e2e": "playwright test",
+    "test:int": "vitest run --config ./vitest.config.mts"
   },
   "dependencies": {
     "@payloadcms/db-mongodb": "^3.0.0",
     "@payloadcms/next": "^3.0.0",
+    "@payloadcms/plugin-cloud-storage": "^3.0.0",
     "@payloadcms/richtext-lexical": "^3.0.0",
     "@payloadcms/ui": "^3.0.0",
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
     "graphql": "^16.8.1",
-    "next": "^14.2.3",
+    "next": "^15.3.4",
     "payload": "^3.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "sharp": "0.32.6"
   },
   "devDependencies": {
     "@playwright/test": "^1.44.0",
     "@testing-library/react": "^15.0.6",
     "@types/node": "^20.12.12",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.19",
-    "eslint": "^8.57.0",
+    "cross-env-file": "^1.0.2",
+    "eslint": "^9.30.1",
     "eslint-config-next": "^14.2.3",
     "jsdom": "^24.0.0",
     "playwright": "^1.44.0",
-    "playwright-core": "^1.44.0",
     "postcss": "^8.4.38",
     "prettier": "^3.2.5",
     "tailwindcss": "^3.4.3",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
-    "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^1.6.0"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "esbuild",
+      "unrs-resolver"
+    ]
   }
 }
 </file>

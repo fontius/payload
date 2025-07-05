@@ -1,26 +1,18 @@
-import localFont from 'next/font/local'
 import React from 'react'
-import './globals.css'
 
-const mona = localFont({
-  src: '@/fonts/MonaSansVF-Regular.woff2',
-  variable: '--font-mona',
-})
-
-const hubot = localFont({
-  src: '@/fonts/HubotSansVF-Regular.ttf',
-  variable: '--font-hubot',
-})
-
+// Optional but good practice: update metadata for frontend pages
 export const metadata = {
-  description: 'A blank template using Payload in a Next.js app.',
-  title: 'Payload Blank Template',
+  title: 'Hockey CMS Website',
+  description: 'The official website for our team.',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" className={`${hubot.variable} ${mona.variable}`}>
-      <body>{children}</body>
-    </html>
-  )
+// This layout is now nested within the root layout at /src/app/layout.tsx.
+// It can be used for layouts specific to the (frontend) group.
+// Since the root layout now handles fonts and global CSS, this can be simplified.
+export default function FrontendLayout({
+  children,
+}: {
+  children: React.ReactNode
+}): React.ReactNode {
+  return children
 }

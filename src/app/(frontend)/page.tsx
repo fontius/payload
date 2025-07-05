@@ -101,9 +101,7 @@ export default function HomePage() {
         </div>
       </main>
       <footer className="bg-sailor-100 text-center py-6 mt-16 border-t-2 border-gold">
-        <p className="text-gray-300">
-          © {new Date().getFullYear()} Payload App. All Rights Reserved.
-        </p>
+        <p className="text-gray-300">Payload App. All Rights Reserved.</p>
         <p className="text-sm text-gray-400 mt-1">Powered by Payload CMS & Next.js</p>
       </footer>
     </div>
