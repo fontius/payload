@@ -12,20 +12,21 @@
     "lint": "next lint",
     "payload": "payload",
     "generate:types": "payload generate:types",
-    "seed:local": "dotenv -e .env.local -- ts-node src/payload/seed/index.ts",
-    "seed:staging": "dotenv -e .env.staging -- ts-node src/payload/seed/index.ts",
-    "seed:production": "dotenv -e .env.production -- ts-node src/payload/seed/index.ts"
+    "seed:local": "dotenv -e .env.local -- ts-node src/seed/index.ts",
+    "seed:staging": "dotenv -e .env.staging -- ts-node src/seed/index.ts",
+    "seed:production": "dotenv -e .env.production -- ts-node src/seed/index.ts"
   },
   "dependencies": {
     "@payloadcms/db-mongodb": "^3.0.0",
     "@payloadcms/next": "^3.0.0",
-    "@payloadcms/plugin-cloud-storage": "^3.0.0",
     "@payloadcms/richtext-lexical": "^3.0.0",
     "@payloadcms/ui": "^3.0.0",
+    "cloudinary": "^2.7.0",
     "dotenv": "^16.4.5",
     "graphql": "^16.8.1",
     "next": "^15.3.4",
     "payload": "^3.0.0",
+    "payload-cloudinary-plugin": "^0.1.14",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "sharp": "^0.33.4"

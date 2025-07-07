@@ -1,15 +1,14 @@
-import localFont from 'next/font/local'
 import React from 'react'
+import localFont from 'next/font/local'
 import './globals.css'
 
-// Load the fonts
-const mona = localFont({
-  src: '../fonts/MonaSansVF-Regular.woff2',
+// Define fonts directly in the root layout
+export const mona = localFont({
+  src: '../fonts/MonaSansVF-Regular.woff2', // Correct relative path
   variable: '--font-mona',
 })
-
-const hubot = localFont({
-  src: '../fonts/HubotSansVF-Regular.ttf',
+export const hubot = localFont({
+  src: '../fonts/HubotSansVF-Regular.ttf', // Correct relative path
   variable: '--font-hubot',
 })
 
@@ -21,7 +20,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${hubot.variable} ${mona.variable}`}>
-      <body>{children}</body>
+      <body className="frontend-scope">{children}</body>
     </html>
   )
 }

@@ -3,6 +3,29 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Brand colors defined as CSS variables with RGB values for opacity support */
+    /* Using values from the old tailwind.config.js for consistency */
+    --color-sailor: 16 46 80; /* #102E50 */
+    --color-sailor-100: 50 75 115; /* #324B73 */
+    --color-sailor-200: 80 119 152; /* #507798 */
+    --color-sailor-300: 109 147 188; /* #6D93BC */
+    --color-sailor-400: 140 176 224; /* #8CB0E0 */
+
+    --color-gold: 245 196 94; /* #F5C45E */
+    --color-gold-100: 249 215 140; /* #F9D78C */
+    --color-gold-200: 251 217 167; /* #FBD9A7 */
+    --color-gold-300: 252 234 194; /* #FCEAC2 */
+
+    --color-orange: 231 139 72; /* #E78B48 */
+    --color-orange-100: 236 157 105; /* #EC9D69 */
+    --color-orange-200: 241 174 138; /* #F1AE8A */
+
+    --color-red: 190 61 42; /* #BE3D2A */
+    --color-red-100: 210 90 70; /* #D25A46 */
+    --color-red-200: 228 139 121; /* #E48B79 */
+  }
+
   body {
     @apply bg-sailor text-gray-200 font-sans;
     -webkit-font-smoothing: antialiased;
@@ -26,11 +49,14 @@
     @apply text-3xl md:text-4xl;
   }
 
-  p {
-    @apply text-base leading-relaxed;
+  /*
+   * Scope generic paragraph and link styles to the frontend only
+   * to avoid interfering with the Payload admin UI's component styling.
+  */
+  .frontend-scope p {
+    @apply mb-4 leading-relaxed; /* Added margin-bottom for better spacing */
   }
-
-  a {
-    @apply text-gold hover:text-gold-100 transition-colors duration-200;
+  .frontend-scope a {
+    @apply text-gold hover:text-gold-200 transition-colors duration-200; /* Use a lighter gold for hover */
   }
 }

@@ -1,6 +1,6 @@
-# Hockey Team Website - Headless CMS
 
-This repository contains the content management "brain" for the Hockey Team Website. It is a headless CMS built with **Payload 3.0** and **Next.js 15**, designed for a modern, scalable, and maintainable web architecture.
+
+It is a headless CMS built with **Payload 3.0** and **Next.js 15**, designed for a modern, scalable, and maintainable web architecture.
 
 
 ## Core Technologies

@@ -43,7 +43,6 @@ The content is organized as follows:
 src/
   app/
     (frontend)/
-      globals.css
       layout.tsx
       page.tsx
     (payload)/
@@ -62,11 +61,17 @@ src/
       layout.tsx
     my-route/
       route.ts
+    globals.css
     layout.tsx
-    postcss.config.js
   collections/
     Media.ts
     Users.ts
+  payload/
+    collections/
+      Media.ts
+    components/
+      Logo.tsx
+  fonts.ts
   payload-types.ts
   payload.config.ts
 .gitignore
@@ -76,51 +81,171 @@ Dockerfile
 eslint.config.mjs
 next.config.mjs
 package.json
+postcss.config.mjs
 README.md
-tailwind.config.js
+tailwind.config.ts
 tsconfig.json
 </directory_structure>
 
 <files>
 This section contains the contents of the repository's files.
 
-<file path="src/app/(frontend)/globals.css">
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+<file path="src/payload/collections/Media.ts">
+import type { CollectionConfig } from 'payload'
 
-@layer base {
-  body {
-    @apply bg-sailor text-gray-200 font-sans;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-display font-bold text-white;
-  }
-
-  h1 {
-    @apply text-4xl md:text-5xl lg:text-6xl;
-  }
-
-  h2 {
-    @apply text-3xl md:text-4xl;
-  }
-
-  p {
-    @apply text-base leading-relaxed;
-  }
-
-  a {
-    @apply text-gold hover:text-gold-100 transition-colors duration-200;
-  }
+export const Media: CollectionConfig = {
+  slug: 'media',
+  admin: {
+    useAsTitle: 'alt',
+    description: 'Upload images and other media for use across the site.',
+  },
+  upload: {
+    // When using cloud storage, we disable local storage.
+    // This is important so that files are not stored on the server's ephemeral file system.
+    disableLocalStorage: true,
+    imageSizes: [
+      {
+        name: 'thumbnail',
+        width: 480,
+        height: 320,
+        position: 'centre',
+      },
+      {
+        name: 'card',
+        width: 768,
+        height: 1024,
+        position: 'centre',
+      },
+      {
+        name: 'tablet',
+        width: 1024,
+        height: undefined, // By leaving height undefined, it will be sized proportionately
+        position: 'centre',
+      },
+    ],
+    adminThumbnail: 'thumbnail',
+    mimeTypes: ['image/*'], // Allow all image types
+  },
+  fields: [
+    {
+      name: 'alt',
+      type: 'text',
+      required: true,
+      label: 'Alt Text',
+      admin: {
+        description: 'Descriptive text for screen readers and search engines.',
+      },
+    },
+  ],
 }
+</file>
+
+<file path="src/payload/components/Logo.tsx">
+'use client'
+
+import React, { useEffect } from 'react'
+import { mona, hubot } from '@/fonts'
+
+// By importing the global stylesheet here, Webpack will bundle it and apply it to the admin UI.
+import '../../app/globals.css'
+
+const Logo = () => {
+  useEffect(() => {
+    // Add font variable classes to the `<html>` element of the admin panel
+    // to ensure custom fonts are applied correctly.
+    const htmlElement = document.documentElement
+    htmlElement.classList.add(mona.variable, hubot.variable)
+
+    // Cleanup function to remove the classes when the component unmounts
+    return () => {
+      htmlElement.classList.remove(mona.variable, hubot.variable)
+    }
+  }, [])
+
+  return <h2 className="font-display font-bold">Hockey CMS</h2>
+}
+
+export default Logo
+</file>
+
+<file path="src/fonts.ts">
+import localFont from 'next/font/local'
+
+// Load the fonts
+export const mona = localFont({
+  src: './fonts/MonaSansVF-Regular.woff2',
+  variable: '--font-mona',
+})
+
+export const hubot = localFont({
+  src: './fonts/HubotSansVF-Regular.ttf',
+  variable: '--font-hubot',
+})
+</file>
+
+<file path="postcss.config.mjs">
+/** @type {import('postcss-load-config').Config} */
+const config = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+
+export default config
+</file>
+
+<file path="tailwind.config.ts">
+import type { Config } from 'tailwindcss'
+import defaultTheme from 'tailwindcss/defaultTheme'
+
+const config: Config = {
+  content: [
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/payload/components/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      fontFamily: {
+        // Map the CSS variables from the root layout, with system font fallbacks.
+        // IMPORTANT: The two config files had swapped font assignments.
+        // Please verify that 'mona' should be 'sans' and 'hubot' should be 'display'.
+        sans: ['var(--font-mona)', ...defaultTheme.fontFamily.sans],
+        display: ['var(--font-hubot)', ...defaultTheme.fontFamily.sans],
+      },
+      colors: {
+        // Define colors using CSS variables for robust opacity support
+        sailor: {
+          DEFAULT: 'rgb(var(--color-sailor) / <alpha-value>)',
+          '100': 'rgb(var(--color-sailor-100) / <alpha-value>)',
+          '200': 'rgb(var(--color-sailor-200) / <alpha-value>)',
+          '300': 'rgb(var(--color-sailor-300) / <alpha-value>)',
+          '400': 'rgb(var(--color-sailor-400) / <alpha-value>)',
+        },
+        gold: {
+          DEFAULT: 'rgb(var(--color-gold) / <alpha-value>)',
+          '100': 'rgb(var(--color-gold-100) / <alpha-value>)',
+          '200': 'rgb(var(--color-gold-200) / <alpha-value>)',
+          '300': 'rgb(var(--color-gold-300) / <alpha-value>)',
+        },
+        orange: {
+          DEFAULT: 'rgb(var(--color-orange) / <alpha-value>)',
+          '100': 'rgb(var(--color-orange-100) / <alpha-value>)',
+          '200': 'rgb(var(--color-orange-200) / <alpha-value>)',
+        },
+        red: {
+          DEFAULT: 'rgb(var(--color-red) / <alpha-value>)',
+          '100': 'rgb(var(--color-red-100) / <alpha-value>)',
+          '200': 'rgb(var(--color-red-200) / <alpha-value>)',
+        },
+      },
+    },
+  },
+  plugins: [],
+}
+
+export default config
 </file>
 
 <file path="src/app/(payload)/admin/[[...segments]]/not-found.tsx">
@@ -269,24 +394,68 @@ export const GET = async (request: Request) => {
 }
 </file>
 
-<file path="src/app/layout.tsx">
-import React from 'react'
+<file path="src/app/globals.css">
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  )
-}
-</file>
+@layer base {
+  :root {
+    /* Brand colors defined as CSS variables with RGB values for opacity support */
+    /* Using values from the old tailwind.config.js for consistency */
+    --color-sailor: 16 46 80; /* #102E50 */
+    --color-sailor-100: 50 75 115; /* #324B73 */
+    --color-sailor-200: 80 119 152; /* #507798 */
+    --color-sailor-300: 109 147 188; /* #6D93BC */
+    --color-sailor-400: 140 176 224; /* #8CB0E0 */
 
-<file path="src/app/postcss.config.js">
-module.exports = {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
+    --color-gold: 245 196 94; /* #F5C45E */
+    --color-gold-100: 249 215 140; /* #F9D78C */
+    --color-gold-200: 251 217 167; /* #FBD9A7 */
+    --color-gold-300: 252 234 194; /* #FCEAC2 */
+
+    --color-orange: 231 139 72; /* #E78B48 */
+    --color-orange-100: 236 157 105; /* #EC9D69 */
+    --color-orange-200: 241 174 138; /* #F1AE8A */
+
+    --color-red: 190 61 42; /* #BE3D2A */
+    --color-red-100: 210 90 70; /* #D25A46 */
+    --color-red-200: 228 139 121; /* #E48B79 */
+  }
+
+  body {
+    @apply bg-sailor text-gray-200 font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display font-bold text-white;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  /*
+   * Scope generic paragraph and link styles to the frontend only
+   * to avoid interfering with the Payload admin UI's component styling.
+  */
+  .frontend-scope p {
+    @apply mb-4 leading-relaxed; /* Added margin-bottom for better spacing */
+  }
+  .frontend-scope a {
+    @apply text-gold hover:text-gold-200 transition-colors duration-200; /* Use a lighter gold for hover */
+  }
 }
 </file>
 
@@ -295,17 +464,52 @@ import type { CollectionConfig } from 'payload'
 
 export const Media: CollectionConfig = {
   slug: 'media',
+  admin: {
+    useAsTitle: 'alt',
+    description: 'Upload images and other media for use across the site.',
+  },
   access: {
     read: () => true,
+  },
+  upload: {
+    // These image sizes will be generated for all uploaded images
+    imageSizes: [
+      {
+        name: 'thumbnail',
+        width: 480,
+        height: 320,
+        position: 'center', // Note: use 'center', not 'centre'
+      },
+      {
+        name: 'card',
+        width: 768,
+        height: 1024,
+        position: 'center',
+      },
+      {
+        name: 'tablet',
+        width: 1024,
+        // By leaving height undefined, it will be sized proportionately
+        height: undefined,
+        position: 'center',
+      },
+    ],
+    // This will be the thumbnail shown in the admin panel
+    adminThumbnail: 'thumbnail',
+    // Allow all image types
+    mimeTypes: ['image/*'],
   },
   fields: [
     {
       name: 'alt',
       type: 'text',
       required: true,
+      label: 'Alt Text',
+      admin: {
+        description: 'Descriptive text for screen readers and search engines.',
+      },
     },
   ],
-  upload: true,
 }
 </file>
 
@@ -449,58 +653,28 @@ const eslintConfig = [
 export default eslintConfig
 </file>
 
-<file path="tailwind.config.js">
-/** @type {import('tailwindcss').Config} */
-import defaultTheme from 'tailwindcss/defaultTheme'
-
-const tailwindConfig = {
-  content: [
-    './src/app/(frontend)/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/collections/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
-  theme: {
-    extend: {
-      colors: {
-        sailor: {
-          DEFAULT: '#102E50', // primary dark navy
-          100: '#324B73', // lighter shade
-          200: '#507798',
-          300: '#6D93BC',
-          400: '#8CB0E0',
-        },
-        gold: {
-          DEFAULT: '#F5C45E', // mustard/gold accent
-          100: '#F9D78C',
-          200: '#FBD9A7',
-          300: '#FCEAC2',
-        },
-        orange: {
-          DEFAULT: '#E78B48', // team orange
-          100: '#EC9D69',
-          200: '#F1AE8A',
-        },
-        red: {
-          DEFAULT: '#BE3D2A', // bold red
-          100: '#D25A46',
-          200: '#E48B79',
-        },
-      },
-      fontFamily: {
-        sans: ['var(--font-hubot)', ...defaultTheme.fontFamily.sans],
-        display: ['var(--font-mona)', ...defaultTheme.fontFamily.sans],
-      },
-    },
-  },
-  plugins: [],
-}
-
-export default tailwindConfig
-</file>
-
 <file path="src/app/(payload)/admin/importMap.js">
 export const importMap = {
 
+}
+</file>
+
+<file path="src/app/layout.tsx">
+import React from 'react'
+import './globals.css'
+import { mona, hubot } from '@/fonts'
+
+export const metadata = {
+  title: 'Payload App',
+  description: 'A Payload app with Next.js',
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" className={`${hubot.variable} ${mona.variable}`}>
+      <body className="frontend-scope">{children}</body>
+    </html>
+  )
 }
 </file>
 
@@ -595,41 +769,6 @@ Deployment is handled automatically by Coolify via webhooks connected to this Gi
 *   **Staging:** A push or merge to the `staging` (or `develop`) branch will trigger a deployment to the staging environment.
 
 Coolify uses the `Dockerfile` in this repository to build a production-optimized container image. Environment variables (like the database URI and payload secret) are injected securely from the Coolify dashboard.
-</file>
-
-<file path="tsconfig.json">
-{
-  "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "plugins": [{ "name": "next" }],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "tailwind.config.js",
-    "next.config.mjs"
-  ],
-  "exclude": ["node_modules"]
-}
 </file>
 
 <file path="src/payload-types.ts">
@@ -934,40 +1073,6 @@ declare module 'payload' {
 }
 </file>
 
-<file path="src/payload.config.ts">
-import { mongooseAdapter } from '@payloadcms/db-mongodb'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import path from 'path'
-import { buildConfig } from 'payload'
-import { fileURLToPath } from 'url'
-import sharp from 'sharp'
-
-import { Users } from './collections/Users'
-import { Media } from './collections/Media'
-
-const filename = fileURLToPath(import.meta.url)
-const dirname = path.dirname(filename)
-
-export default buildConfig({
-  admin: {
-    user: Users.slug,
-  },
-  collections: [Users, Media],
-  editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || '',
-  typescript: {
-    outputFile: path.resolve(dirname, 'payload-types.ts'),
-  },
-  db: mongooseAdapter({
-    url: process.env.DATABASE_URI || '',
-  }),
-  sharp,
-  plugins: [
-    // storage-adapter-placeholder
-  ],
-})
-</file>
-
 <file path=".gitignore">
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
@@ -1038,48 +1143,146 @@ pnpm-lock.yaml
 </file>
 
 <file path="docker-compose.yml">
-version: '3'
-
 services:
-  # This service runs the MongoDB database in a container.
-  # It's the only service needed for local development.
   mongo:
     image: mongo:latest
-    container_name: payload-mongo-db
+    container_name: hockey-cms-mongo
     ports:
       - '27017:27017'
-    restart: unless-stopped
-    command:
-      - --storageEngine=wiredTiger
+    environment:
+      # These variables create the root user on first launch
+      MONGO_INITDB_ROOT_USERNAME: root-admin
+      MONGO_INITDB_ROOT_PASSWORD: fun4fly # <-- Replace this!
     volumes:
-      - data:/data/db
-    logging:
-      driver: none
+      - mongo-data:/data/db
 
 volumes:
-  data:
+  mongo-data:
 </file>
 
-<file path="next.config.mjs">
+<file path="tsconfig.json">
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@payload-config": ["./src/payload.config.ts"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
+</file>
+
+<file path="src/payload.config.ts">
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { mongooseAdapter } from '@payloadcms/db-mongodb'
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { buildConfig } from 'payload'
+import { cloudStorage } from '@payloadcms/plugin-cloud-storage'
+import { s3Adapter } from '@payloadcms/storage-s3'
+
+import { Users } from './collections/Users'
+import { Media } from './collections/Media'
+import Logo from './payload/components/Logo' // This path is correct
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+// Configure the S3 adapter to use Cloudinary's S3-compatible API.
+// Your Cloudinary API Key is the Access Key ID, and the API Secret is the Secret Access Key.
+const s3StorageAdapter = s3Adapter({
+  config: {
+    endpoint: `https://s3.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}`,
+    region: 'us-east-1', // This is a common default, adjust if your Cloudinary account is different
+    credentials: {
+      accessKeyId: process.env.CLOUDINARY_API_KEY,
+      secretAccessKey: process.env.CLOUDINARY_API_SECRET,
+    },
+  },
+  // Your Cloudinary cloud name acts as the "bucket" in this context.
+  bucket: process.env.CLOUDINARY_CLOUD_NAME,
+})
+
+// Validate that essential environment variables are defined.
+if (!process.env.PAYLOAD_SECRET) {
+  throw new Error('The PAYLOAD_SECRET environment variable is missing or empty.')
+}
+
+// For better debugging, warn if cloud storage variables are missing.
+if (
+  !process.env.CLOUDINARY_CLOUD_NAME ||
+  !process.env.CLOUDINARY_API_KEY ||
+  !process.env.CLOUDINARY_API_SECRET
+) {
+  console.warn(
+    'Cloudinary environment variables are not fully configured. Media uploads to the cloud will not work.',
+  )
+}
+export default buildConfig({
+  secret: process.env.PAYLOAD_SECRET,
+  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
+  admin: {
+    user: Users.slug,
+    components: {
+      graphics: {
+        Logo,
+      },
+    },
+  },
+  db: mongooseAdapter({
+    url: process.env.DATABASE_URI || false,
+  }),
+  editor: lexicalEditor({}),
+  collections: [Users, Media],
+  plugins: [
+    cloudStorage({
+      collections: {
+        media: {
+          adapter: s3StorageAdapter,
+        },
+      },
+    }),
+  ],
+  typescript: {
+    // Place the generated types file inside the `src` directory for better organization
+    outputFile: path.resolve(__dirname, 'payload-types.ts'),
+  },
+})
+</file>
+
+<file path="next.config.mjs">
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /*
-    The `output: 'standalone'` option is required by the provided Dockerfile.
-    It creates a standalone folder with only the necessary files for production,
-    minimizing the Docker image size.
-  */
-  output: 'standalone',
-
   webpack: (config) => {
-    // This explicitly configures the Webpack resolver to ensure it
-    // understands the `@/` path alias, fixing the font loading issue.
-    config.resolve.alias['@'] = path.resolve(__dirname, './src')
+    // The MongoDB driver conditionally requires these modules.
+    // This is the standard solution to the "Module not found: Can't resolve 'aws4'" error.
+    // We can safely ignore them as they are not needed for Payload's core functionality.
+    config.externals.push({
+      aws4: 'commonjs aws4',
+      'mongodb-client-encryption': 'commonjs mongodb-client-encryption',
+    })
+
     return config
   },
 }
@@ -1088,144 +1291,72 @@ export default nextConfig
 </file>
 
 <file path="src/app/(frontend)/layout.tsx">
-import localFont from 'next/font/local'
 import React from 'react'
-import './globals.css'
 
-const mona = localFont({
-  src: '@/fonts/MonaSansVF-Regular.woff2',
-  variable: '--font-mona',
-})
-
-const hubot = localFont({
-  src: '@/fonts/HubotSansVF-Regular.ttf',
-  variable: '--font-hubot',
-})
-
+// Optional but good practice: update metadata for frontend pages
 export const metadata = {
-  description: 'A blank template using Payload in a Next.js app.',
-  title: 'Payload Blank Template',
+  title: 'Hockey CMS Website',
+  description: 'The official website for our team.',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" className={`${hubot.variable} ${mona.variable}`}>
-      <body>{children}</body>
-    </html>
-  )
+// This layout is now nested within the root layout at /src/app/layout.tsx.
+// It can be used for layouts specific to the (frontend) group.
+// Since the root layout now handles fonts and global CSS, this can be simplified.
+export default function FrontendLayout({
+  children,
+}: {
+  children: React.ReactNode
+}): React.ReactNode {
+  return children
 }
 </file>
 
 <file path="src/app/(frontend)/page.tsx">
 import React from 'react'
 
-// Helper component for a color swatch
-const ColorSwatch = ({ name, className }: { name: string; className: string }) => (
-  <div>
-    <div className={`h-24 rounded-lg shadow-md ${className}`}></div>
-    <p className="mt-2 text-center font-mono text-sm text-gray-300">{name}</p>
-  </div>
-)
-
-// ===================================
-// Main Page Component
-// ===================================
 export default function HomePage() {
   return (
-    <div className="bg-sailor text-white min-h-screen flex flex-col">
-      <main className="flex-grow container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-7xl font-display font-extrabold text-gold uppercase tracking-wider">
-            Theme Showcase
+    <main className="container mx-auto p-8 md:p-12">
+      <div className="space-y-12">
+        {/* --- Header Section --- */}
+        <div className="text-center space-y-4">
+          <h1 className="font-display text-5xl md:text-6xl lg:text-7xl text-gold">
+            Welcome to the Hockey Team
           </h1>
-          <p className="text-xl md:text-2xl text-gray-300 mt-2">
-            A showcase of the default colors and fonts.
+          <p className="font-sans text-lg text-gray-300 max-w-2xl mx-auto">
+            This page demonstrates the custom fonts, colors, and base styles configured in Tailwind
+            CSS. The 'Hubot Sans' font is used for headings, and 'Mona Sans' for body text.
           </p>
         </div>
 
-        <div className="space-y-16">
-          {/* Colors Section */}
-          <section>
-            <h2 className="text-4xl font-display text-center mb-8">Colors</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 max-w-5xl mx-auto">
-              {/* Sailor Palette */}
-              <ColorSwatch name="sailor" className="bg-sailor border border-sailor-100" />
-              <ColorSwatch name="sailor-100" className="bg-sailor-100" />
-              <ColorSwatch name="sailor-200" className="bg-sailor-200" />
-              <ColorSwatch name="sailor-300" className="bg-sailor-300" />
-              <ColorSwatch name="sailor-400" className="bg-sailor-400" />
-              {/* Gold Palette */}
-              <ColorSwatch name="gold" className="bg-gold" />
-              <ColorSwatch name="gold-100" className="bg-gold-100" />
-              <ColorSwatch name="gold-200" className="bg-gold-200" />
-              <ColorSwatch name="gold-300" className="bg-gold-300" />
-              {/* Accent Palettes */}
-              <ColorSwatch name="orange" className="bg-orange" />
-              <ColorSwatch name="orange-100" className="bg-orange-100" />
-              <ColorSwatch name="orange-200" className="bg-orange-200" />
-              <ColorSwatch name="red" className="bg-red" />
-              <ColorSwatch name="red-100" className="bg-red-100" />
-              <ColorSwatch name="red-200" className="bg-red-200" />
-            </div>
-          </section>
+        {/* --- UI Components Showcase --- */}
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Card Example */}
+          <div className="bg-sailor/50 border border-gold/20 rounded-lg p-6 space-y-4 text-center md:text-left">
+            <h2 className="font-display text-gold">Styled Card Component</h2>
+            <p className="font-sans">
+              This card uses our custom `sailor` background color with some opacity and a `gold`
+              border. The text inside follows the global styles.
+            </p>
+            <a
+              href="/admin"
+              className="inline-block bg-gold text-sailor font-bold font-display py-2 px-5 rounded-md hover:bg-gold-100 transition-all duration-300 mt-2"
+            >
+              Go to Admin
+            </a>
+          </div>
 
-          {/* Typography Section */}
-          <section>
-            <h2 className="text-4xl font-display text-center mb-8">Typography</h2>
-            <div className="bg-sailor-100 p-8 rounded-lg space-y-6 max-w-4xl mx-auto">
-              <div className="space-y-4">
-                <p className="text-sm uppercase tracking-widest text-gold-100 mb-2">
-                  Display Font (font-display)
-                </p>
-                <h3 className="font-display text-4xl font-extrabold text-white">
-                  The quick brown fox jumps over
-                </h3>
-                <p className="font-display text-2xl font-light">
-                  The quick brown fox jumps over (Light)
-                </p>
-              </div>
-              <div>
-                <p className="text-sm uppercase tracking-widest text-gold-100 mb-2">
-                  Body Font (default)
-                </p>
-                <p className="text-lg text-gray-300">
-                  The quick brown fox jumps over the lazy dog. This is the default body font, used
-                  for paragraphs and other general text content. It is designed for readability.
-                </p>
-              </div>
-              <div className="border-t border-sailor-200 pt-6 space-y-4">
-                <p className="text-sm uppercase tracking-widest text-gold-100">
-                  Font Weights (Body/Sans)
-                </p>
-                <p className="font-light">Font Light</p>
-                <p className="font-normal">Font Normal</p>
-                <p className="font-medium">Font Medium</p>
-                <p className="font-semibold">Font Semibold</p>
-                <p className="font-bold">Font Bold</p>
-                <p className="font-extrabold">Font Extrabold</p>
-              </div>
-              <div className="border-t border-sailor-200 pt-6 flex flex-wrap gap-x-8 gap-y-4 items-baseline">
-                <p className="text-xs">text-xs</p>
-                <p className="text-sm">text-sm</p>
-                <p>text-base</p>
-                <p className="text-lg">text-lg</p>
-                <p className="text-xl">text-xl</p>
-                <p className="text-2xl">text-2xl</p>
-                <p className="text-3xl">text-3xl</p>
-                <p className="text-4xl">text-4xl</p>
-                <p className="text-5xl">text-5xl</p>
-              </div>
-            </div>
-          </section>
+          {/* Font & Color Showcase */}
+          <div className="bg-sailor/50 border border-gold/20 rounded-lg p-6 space-y-4">
+            <h3 className="font-display">Font & Color Test</h3>
+            <p className="font-sans text-base">This is the standard paragraph font (Mona Sans).</p>
+            <p className="font-display text-lg text-gold">
+              This is the display font (Hubot Sans) applied to a paragraph.
+            </p>
+          </div>
         </div>
-      </main>
-      <footer className="bg-sailor-100 text-center py-6 mt-16 border-t-2 border-gold">
-        <p className="text-gray-300">
-          © {new Date().getFullYear()} Payload App. All Rights Reserved.
-        </p>
-        <p className="text-sm text-gray-400 mt-1">Powered by Payload CMS & Next.js</p>
-      </footer>
-    </div>
+      </div>
+    </main>
   )
 }
 </file>
@@ -1238,54 +1369,45 @@ export default function HomePage() {
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "cross-env-file -p .env.local next dev",
-    "dev:staging": "cross-env-file -p .env.staging next dev",
+    "dev": "dotenv -e .env.local -- next dev",
+    "dev:staging": "dotenv -e .env.staging -- next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "payload": "payload",
     "generate:types": "payload generate:types",
-    "seed:local": "cross-env-file -p .env.local ts-node src/payload/seed/index.ts",
-    "seed:staging": "cross-env-file -p .env.staging ts-node src/payload/seed/index.ts",
-    "seed:production": "cross-env-file -p .env.production ts-node src/payload/seed/index.ts",
-    "test": "pnpm run test:int && pnpm run test:e2e",
-    "test:e2e": "playwright test",
-    "test:int": "vitest run --config ./vitest.config.mts"
+    "seed:local": "dotenv -e .env.local -- ts-node src/seed/index.ts",
+    "seed:staging": "dotenv -e .env.staging -- ts-node src/seed/index.ts",
+    "seed:production": "dotenv -e .env.production -- ts-node src/seed/index.ts"
   },
   "dependencies": {
     "@payloadcms/db-mongodb": "^3.0.0",
     "@payloadcms/next": "^3.0.0",
     "@payloadcms/plugin-cloud-storage": "^3.0.0",
     "@payloadcms/richtext-lexical": "^3.0.0",
+    "@payloadcms/storage-s3": "^3.0.0",
     "@payloadcms/ui": "^3.0.0",
-    "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
     "graphql": "^16.8.1",
     "next": "^15.3.4",
     "payload": "^3.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "sharp": "0.32.6"
+    "sharp": "^0.33.4"
   },
   "devDependencies": {
-    "@playwright/test": "^1.44.0",
-    "@testing-library/react": "^15.0.6",
     "@types/node": "^20.12.12",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.19",
-    "cross-env-file": "^1.0.2",
+    "dotenv-cli": "^7.4.2",
     "eslint": "^9.30.1",
     "eslint-config-next": "^14.2.3",
-    "jsdom": "^24.0.0",
-    "playwright": "^1.44.0",
     "postcss": "^8.4.38",
     "prettier": "^3.2.5",
     "tailwindcss": "^3.4.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5",
-    "vitest": "^1.6.0"
+    "typescript": "^5.4.5"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0"

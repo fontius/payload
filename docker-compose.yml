@@ -1,20 +1,16 @@
-version: '3'
 
 services:
-  # This service runs the MongoDB database in a container.
-  # It's the only service needed for local development.
   mongo:
     image: mongo:latest
-    container_name: payload-mongo-db
+    container_name: hockey-cms-mongo
     ports:
       - '27017:27017'
-    restart: unless-stopped
-    command:
-      - --storageEngine=wiredTiger
+    environment:
+      # These variables create the root user on first launch
+      MONGO_INITDB_ROOT_USERNAME: root-admin
+      MONGO_INITDB_ROOT_PASSWORD: fun4fly # <-- Replace this!
     volumes:
-      - data:/data/db
-    logging:
-      driver: none
+      - mongo-data:/data/db
 
 volumes:
-  data:
+  mongo-data:
