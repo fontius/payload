@@ -3,11 +3,9 @@ import { fileURLToPath } from 'url'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { buildConfig } from 'payload'
-
-// --- Community Cloudinary Plugin Setup ---
-import { v2 as cloudinary } from 'cloudinary'
-// CORRECTED: Use a default import for this plugin
-import * as cloudinaryPlugin from 'payload-cloudinary-plugin'
+import { s3Storage } from '@payloadcms/storage-s3'
+import { nextPayload } from '@payloadcms/next'
+import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -16,14 +14,26 @@ import Logo from './payload/components/Logo'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Initialize the Cloudinary SDK
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+const s3Adapter = s3Storage({
+  collections: {
+    // Enable S3 storage for the 'media' collection
+    media: true,
+  },
+  bucket: process.env.S3_BUCKET!,
+  config: {
+    endpoint: process.env.S3_ENDPOINT!,
+    // A dummy region is required for S3-compatible services
+    region: 'us-east-1',
+    // Force path style is required for Supabase
+    forcePathStyle: true,
+    credentials: {
+      accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
+    },
+  },
 })
 
-export default buildConfig({
+const config = buildConfig({
   secret: process.env.PAYLOAD_SECRET!,
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
   admin: {
@@ -39,8 +49,11 @@ export default buildConfig({
   }),
   editor: lexicalEditor({}),
   collections: [Users, Media],
-  plugins: [(cloudinaryPlugin as any).default()],
+  plugins: [s3Adapter],
   typescript: {
     outputFile: path.resolve(__dirname, 'payload-types.ts'),
   },
+  sharp,
 })
+
+export default nextPayload(config)

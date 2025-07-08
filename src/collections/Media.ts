@@ -10,9 +10,16 @@ export const Media: CollectionConfig = {
     read: () => true,
   },
   upload: {
-    // This is CRITICAL for the cloudinary plugin to work in a deployed environment.
+    // This is CRITICAL for the storage adapter to work in a deployed environment.
     // It tells Payload to not save the file to the local server disk at all.
     disableLocalStorage: true,
+    // This function is now responsible for generating the public URL.
+    // It is configured via an environment variable for flexibility.
+    generateURL: ({ filename }) => {
+      // The SUPABASE_PUBLIC_URL env var should be set to:
+      // `https://<your-project-ref>.supabase.co/storage/v1/object/public/<your-bucket-name>`
+      return `${process.env.SUPABASE_PUBLIC_URL}/${filename}`
+    },
     imageSizes: [
       {
         name: 'thumbnail',
