@@ -252,7 +252,6 @@ export const Users: CollectionConfig = {
 <file path="src/payload/components/Logo.tsx">
 import React from 'react'
 import type { CustomComponent } from 'payload'
-import '../../app/globals.css'
 
 const Logo: CustomComponent = () => {
   // The font variables are inherited from the root layout, so we can use Tailwind classes directly.
@@ -522,52 +521,6 @@ export const importMap = {
 }
 </file>
 
-<file path="src/collections/Media.ts">
-import type { CollectionConfig } from 'payload'
-
-export const Media: CollectionConfig = {
-  slug: 'media',
-  admin: {
-    useAsTitle: 'alt',
-    description: 'Upload images and other media for use across the site.',
-  },
-  access: {
-    read: () => true,
-  },
-  upload: {
-    // This is CRITICAL for the storage adapter to work in a deployed environment.
-    // It tells Payload to not save the file to the local server disk at all.
-    disableLocalStorage: true,
-    // This function is now responsible for generating the public URL.
-    // It is configured via an environment variable for flexibility.
-    generateURL: ({ filename }) => {
-      // The SUPABASE_PUBLIC_URL env var should be set to:
-      // `https://<your-project-ref>.supabase.co/storage/v1/object/public/<your-bucket-name>`
-      return `${process.env.SUPABASE_PUBLIC_URL}/${filename}`
-    },
-    imageSizes: [
-      {
-        name: 'thumbnail',
-        width: 480,
-        height: 320,
-        position: 'center',
-      },
-      // ... other image sizes
-    ],
-    adminThumbnail: 'thumbnail',
-    mimeTypes: ['image/*'],
-  },
-  fields: [
-    {
-      name: 'alt',
-      type: 'text',
-      required: true,
-      label: 'Alt Text',
-    },
-  ],
-}
-</file>
-
 <file path="src/app/layout.tsx">
 import React from 'react'
 import localFont from 'next/font/local'
@@ -594,6 +547,63 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="frontend-scope">{children}</body>
     </html>
   )
+}
+</file>
+
+<file path="src/collections/Media.ts">
+import type { CollectionConfig } from 'payload'
+
+export const Media: CollectionConfig = {
+  slug: 'media',
+  admin: {
+    useAsTitle: 'alt',
+    description: 'Upload images and other media for use across the site.',
+  },
+  access: {
+    read: () => true,
+  },
+  upload: {
+    // This is correct and still required.
+    disableLocalStorage: true,
+
+    // REMOVE THE `generateURL` FUNCTION FROM HERE.
+    // The S3 storage plugin handles URL generation automatically.
+
+    // Image resizing and compression are still handled by Payload correctly.
+    imageSizes: [
+      {
+        name: 'thumbnail',
+        width: 480,
+        height: 320,
+        position: 'center',
+        formatOptions: { format: 'webp', options: { quality: 80 } },
+      },
+      {
+        name: 'card',
+        width: 640,
+        height: undefined,
+        position: 'center',
+        formatOptions: { format: 'webp', options: { quality: 75 } },
+      },
+      {
+        name: 'hero',
+        width: 1920,
+        height: undefined,
+        position: 'center',
+        formatOptions: { format: 'webp', options: { quality: 85 } },
+      },
+    ],
+    adminThumbnail: 'thumbnail',
+    mimeTypes: ['image/*'],
+  },
+  fields: [
+    {
+      name: 'alt',
+      type: 'text',
+      required: true,
+      label: 'Alt Text',
+    },
+  ],
 }
 </file>
 
@@ -1096,39 +1106,6 @@ const nextConfig = {
 export default nextConfig
 </file>
 
-<file path="tsconfig.json">
-{
-  "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"],
-      "@payload-config": ["./src/payload.config.ts"]
-    }
-  },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
-}
-</file>
-
 <file path="src/app/(frontend)/layout.tsx">
 import React from 'react'
 
@@ -1147,6 +1124,114 @@ export default function FrontendLayout({
   children: React.ReactNode
 }): React.ReactNode {
   return children
+}
+</file>
+
+<file path="tsconfig.json">
+{
+  "compilerOptions": {
+    // Type Checking
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    // Modules
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    // Language and Environment
+    "target": "ESNext",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "jsx": "preserve",
+    // Project Structure
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    // Next.js specific
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "incremental": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "isolatedModules": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build"
+  ]
+}
+</file>
+
+<file path="src/app/(frontend)/page.tsx">
+import React from 'react'
+
+export default function HomePage() {
+  return (
+    <main className="container mx-auto p-8 md:p-12">
+      <div className="space-y-12">
+        {/* --- Header Section --- */}
+        <div className="text-center space-y-4">
+          <h1 className="font-display text-5xl md:text-6xl lg:text-7xl text-gold">
+            Welcome to the Hockey Team
+          </h1>
+          <p className="font-sans text-lg text-gray-300 max-w-2xl mx-auto">
+            This page demonstrates the custom fonts, colors, and base styles configured in Tailwind
+            CSS. The 'Hubot Sans' font is used for headings, and 'Mona Sans' for body text.
+          </p>
+        </div>
+
+        {/* --- UI Components Showcase --- */}
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Card Example */}
+          <div className="bg-sailor/50 border border-gold/20 rounded-lg p-6 space-y-4 text-center md:text-left">
+            <h2 className="font-display text-gold">Styled Card Component</h2>
+            <p className="font-sans">
+              This card uses our custom `sailor` background color with some opacity and a `gold`
+              border. The text inside follows the global styles.
+            </p>
+            <a
+              href="/admin"
+              className="inline-block bg-gold text-sailor font-bold font-display py-2 px-5 rounded-md hover:bg-gold-100 transition-all duration-300 mt-2"
+            >
+              Go to Admin
+            </a>
+          </div>
+
+          {/* Font & Color Showcase */}
+          <div className="bg-sailor/50 border border-gold/20 rounded-lg p-6 space-y-4">
+            <h3 className="font-display">Font & Color Test</h3>
+            <p className="font-sans text-base">This is the standard paragraph font (Mona Sans).</p>
+            <p className="font-display text-lg text-gold">
+              This is the display font (Hubot Sans) applied to a paragraph.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  )
 }
 </file>
 
@@ -1207,56 +1292,6 @@ export default buildConfig({
 })
 </file>
 
-<file path="src/app/(frontend)/page.tsx">
-import React from 'react'
-
-export default function HomePage() {
-  return (
-    <main className="container mx-auto p-8 md:p-12">
-      <div className="space-y-12">
-        {/* --- Header Section --- */}
-        <div className="text-center space-y-4">
-          <h1 className="font-display text-5xl md:text-6xl lg:text-7xl text-gold">
-            Welcome to the Hockey Team
-          </h1>
-          <p className="font-sans text-lg text-gray-300 max-w-2xl mx-auto">
-            This page demonstrates the custom fonts, colors, and base styles configured in Tailwind
-            CSS. The 'Hubot Sans' font is used for headings, and 'Mona Sans' for body text.
-          </p>
-        </div>
-
-        {/* --- UI Components Showcase --- */}
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Card Example */}
-          <div className="bg-sailor/50 border border-gold/20 rounded-lg p-6 space-y-4 text-center md:text-left">
-            <h2 className="font-display text-gold">Styled Card Component</h2>
-            <p className="font-sans">
-              This card uses our custom `sailor` background color with some opacity and a `gold`
-              border. The text inside follows the global styles.
-            </p>
-            <a
-              href="/admin"
-              className="inline-block bg-gold text-sailor font-bold font-display py-2 px-5 rounded-md hover:bg-gold-100 transition-all duration-300 mt-2"
-            >
-              Go to Admin
-            </a>
-          </div>
-
-          {/* Font & Color Showcase */}
-          <div className="bg-sailor/50 border border-gold/20 rounded-lg p-6 space-y-4">
-            <h3 className="font-display">Font & Color Test</h3>
-            <p className="font-sans text-base">This is the standard paragraph font (Mona Sans).</p>
-            <p className="font-display text-lg text-gold">
-              This is the display font (Hubot Sans) applied to a paragraph.
-            </p>
-          </div>
-        </div>
-      </div>
-    </main>
-  )
-}
-</file>
-
 <file path="package.json">
 {
   "name": "hockey-cms",
@@ -1277,15 +1312,15 @@ export default function HomePage() {
     "seed:production": "dotenv -e .env.production -- ts-node src/seed/index.ts"
   },
   "dependencies": {
-    "@payloadcms/db-mongodb": "^3.0.0",
-    "@payloadcms/next": "^3.0.0",
-    "@payloadcms/richtext-lexical": "^3.0.0",
-    "@payloadcms/storage-s3": "^3.0.0",
-    "@payloadcms/ui": "^3.0.0",
+    "@payloadcms/db-mongodb": "3.0.0",
+    "@payloadcms/next": "3.0.0",
+    "@payloadcms/richtext-lexical": "3.0.0",
+    "@payloadcms/storage-s3": "3.0.0",
+    "@payloadcms/ui": "3.0.0",
     "dotenv": "^16.4.5",
     "graphql": "^16.8.1",
     "next": "^15.3.4",
-    "payload": "^3.0.0",
+    "payload": "3.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "sharp": "^0.33.4"

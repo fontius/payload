@@ -10,24 +10,35 @@ export const Media: CollectionConfig = {
     read: () => true,
   },
   upload: {
-    // This is CRITICAL for the storage adapter to work in a deployed environment.
-    // It tells Payload to not save the file to the local server disk at all.
+    // This is correct and still required.
     disableLocalStorage: true,
-    // This function is now responsible for generating the public URL.
-    // It is configured via an environment variable for flexibility.
-    generateURL: ({ filename }) => {
-      // The SUPABASE_PUBLIC_URL env var should be set to:
-      // `https://<your-project-ref>.supabase.co/storage/v1/object/public/<your-bucket-name>`
-      return `${process.env.SUPABASE_PUBLIC_URL}/${filename}`
-    },
+
+    // REMOVE THE `generateURL` FUNCTION FROM HERE.
+    // The S3 storage plugin handles URL generation automatically.
+
+    // Image resizing and compression are still handled by Payload correctly.
     imageSizes: [
       {
         name: 'thumbnail',
         width: 480,
         height: 320,
         position: 'center',
+        formatOptions: { format: 'webp', options: { quality: 80 } },
       },
-      // ... other image sizes
+      {
+        name: 'card',
+        width: 640,
+        height: undefined,
+        position: 'center',
+        formatOptions: { format: 'webp', options: { quality: 75 } },
+      },
+      {
+        name: 'hero',
+        width: 1920,
+        height: undefined,
+        position: 'center',
+        formatOptions: { format: 'webp', options: { quality: 85 } },
+      },
     ],
     adminThumbnail: 'thumbnail',
     mimeTypes: ['image/*'],

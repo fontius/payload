@@ -4,12 +4,9 @@ import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { buildConfig } from 'payload'
 import { s3Storage } from '@payloadcms/storage-s3'
-import { nextPayload } from '@payloadcms/next'
-import sharp from 'sharp'
 
-import { Users } from './collections/Users'
-import { Media } from './collections/Media'
-import Logo from './payload/components/Logo'
+import { Users } from './src/collections/Users'
+import { Media } from './src/collections/Media'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -33,16 +30,11 @@ const s3Adapter = s3Storage({
   },
 })
 
-const config = buildConfig({
+export default buildConfig({
   secret: process.env.PAYLOAD_SECRET!,
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
   admin: {
     user: Users.slug,
-    components: {
-      graphics: {
-        Logo,
-      },
-    },
   },
   db: mongooseAdapter({
     url: process.env.DATABASE_URI || false,
@@ -51,9 +43,6 @@ const config = buildConfig({
   collections: [Users, Media],
   plugins: [s3Adapter],
   typescript: {
-    outputFile: path.resolve(__dirname, 'payload-types.ts'),
+    outputFile: path.resolve(__dirname, 'src', 'payload-types.ts'),
   },
-  sharp,
 })
-
-export default nextPayload(config)
